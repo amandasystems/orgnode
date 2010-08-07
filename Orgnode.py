@@ -228,6 +228,23 @@ def makelist(filename):
             n.setPriority(prtysrch.group(1))
             n.setHeading(prtysrch.group(2))
 
+    # set parent of nodes
+    ancestors = [None]
+    n1 = nodelist[0]
+    l1 = n1.Level()
+    for n2 in nodelist:
+        # n1, l1: previous node and its level
+        # n2, l2: this node and its level
+        l2 = n2.Level()
+        if l1 < l2:
+            ancestors.append(n1)
+        else:
+            while len(ancestors) > l2:
+                ancestors.pop()
+        n2.setParent(ancestors[-1])
+        n1 = n2
+        l1 = l2
+
     return nodelist
 
 ######################
@@ -255,6 +272,7 @@ class Orgnode(object):
         self.properties = dict()
         self.datelist = []
         self.rangelist = []
+        self.parent = None
         for t in alltags:
             self.tags[t] = ''
 
@@ -307,12 +325,16 @@ class Orgnode(object):
         """
         return self.tag
 
-    def Tags(self):
+    def Tags(self, inher=False):
         """
         Returns a list of all tags
         For example, :HOME:COMPUTER: would return ['HOME', 'COMPUTER']
+        If `inher` is True, then all tags from ancestors is included.
         """
-        return self.tags.keys()
+        if inher and self.parent:
+            return set(self.tags.keys()) | set(self.parent.Tags(True))
+        else:
+            return set(self.tags.keys())
 
     def hasTag(self, srch):
         """
@@ -421,6 +443,18 @@ class Orgnode(object):
                 bool(self.deadline) or
                 bool(self.datelist) or
                 bool(self.rangelist) )
+
+    def setParent(self, parent):
+        """
+        Set parent node
+        """
+        self.parent = parent
+
+    def Parent(self):
+        """
+        Return parent node if exist else None.
+        """
+        return self.parent
 
     def __repr__(self):
         """

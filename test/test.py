@@ -6,6 +6,16 @@ from Orgnode import Orgnode, makelist
 
 TESTDIR = os.path.dirname(__file__)
 
+def value_from_data_key(node, key):
+    """
+    Helper function for check_data. Get value from Orgnode by key.
+    """
+    if key == 'tags_inher':
+        return node.Tags(inher=True)
+    else:
+        return node.__getattribute__(key.title())()
+
+
 def check_data(dataname):
     """Helper function for test_data"""
     oname = os.path.join(TESTDIR, dataname + '.org')
@@ -14,7 +24,7 @@ def check_data(dataname):
 
     for (i, (node, kwds)) in enumerate(zip(nodelist, data)):
         for key in kwds:
-            val = node.__getattribute__(key.title())()
+            val = value_from_data_key(node, key)
             eq_(kwds[key], val,
                 msg=('check value of %d-th node of key "%s" from "%s". '
                      'Orgnode.%s() = %s != %s.'
