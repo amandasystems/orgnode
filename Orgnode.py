@@ -82,7 +82,7 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
     heading       = ""
     bodytext      = ""
     tag1          = ""      # The first tag enclosed in ::
-    alltags       = []      # list of all tags in headline
+    alltags       = set([]) # set of all tags in headline
     sched_date    = ''
     deadline_date = ''
     datelist      = []
@@ -115,16 +115,15 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
             heading =  hdng.group(2)
             bodytext = ""
             tag1 = ""
-            alltags = []       # list of all tags in headline
+            alltags = set() # set of all tags in headline
             tagsrch = re.search('(.*?)\s*:(.*?):(.*?)$',heading)
             if tagsrch:
                 heading = tagsrch.group(1)
                 tag1 = tagsrch.group(2)
-                alltags.append(tag1)
+                alltags.add(tag1)
                 tag2 = tagsrch.group(3)
                 if tag2:
-                    for t in tag2.split(':'):
-                        if t != '': alltags.append(t)
+                    alltags |= set(tag2.split(':')) - set([''])
         else:      # we are processing a non-heading line
             if line[:10] == '#+SEQ_TODO':
                 todos |= set(re.findall(' ([A-Z][A-Z0-9]+)\(?', line))
