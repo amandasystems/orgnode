@@ -2,7 +2,7 @@ import os
 from glob import glob
 from nose.tools import eq_
 
-from Orgnode import Orgnode, makelist, get_daterangelist, get_datetime
+from Orgnode import Orgnode, makelist, find_daterangelist, get_datetime
 
 TESTDIR = os.path.dirname(__file__)
 
@@ -39,7 +39,7 @@ def test_data():
         yield (check_data, dataname)
 
 
-def test_get_daterangelist():
+def test_find_daterangelist():
     datefmt0 = "<%(Y)04d-%(M)02d-%(D)02d %(d)s>"
     datefmt1 = "<%(Y)04d-%(M)02d-%(D)02d %(d)s %(h)02d:%(m)02d>"
 
@@ -65,7 +65,7 @@ def test_get_daterangelist():
          get_datetime(d1['Y'], d1['M'], d1['D'], d1['h'], d1['m']))]
 
     for context in ["%s", " %s", "%s ", "aaa%sbbb"]:
-        (datelist, rangelist) =  get_daterangelist(context % datestr)
+        (datelist, rangelist) = find_daterangelist(context % datestr)
         for (des, act) in zip(desired_datelist, datelist):
             assert des == act
         for (des, act) in zip(desired_rangelist, rangelist):

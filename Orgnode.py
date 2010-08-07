@@ -48,7 +48,7 @@ def _re_compile_date():
     return re_date
 
 _RE_DATE = _re_compile_date()
-def get_daterangelist(string):
+def find_daterangelist(string):
     datelist = []
     rangelist = []
     for dm in _RE_DATE.findall(string):
@@ -63,7 +63,7 @@ def get_daterangelist(string):
 
 _RE_SCHEDULED = re.compile(
     'SCHEDULED:\s+<(\d+)\-(\d+)\-(\d+)[^>\d]*((\d+)\:(\d+))?>')
-def get_scheduled(line):
+def find_scheduled(line):
     """
     Find SCHEDULED from given string.
     Return datetime object if found else None.
@@ -86,7 +86,7 @@ def get_scheduled(line):
 
 _RE_DEADLINE = re.compile(
     'DEADLINE:\s+<(\d+)\-(\d+)\-(\d+)[^>\d]*((\d+)\:(\d+))?>')
-def get_deadline(line):
+def find_deadline(line):
     """
     Find DEADLINE from given string.
     Return datetime object if found else None.
@@ -108,7 +108,7 @@ def get_deadline(line):
     return deadline_date
 
 _RE_TAGSRCH = re.compile('(.*?)\s*:(.*?):(.*?)$')
-def get_tags_and_heading(heading):
+def find_tags_and_heading(heading):
     """
     Get first tag, all tags, and heading without tags.
     This is helper function of makelist.
@@ -178,7 +178,7 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
             level = hdng.group(1)
             heading =  hdng.group(2)
             bodytext = ""
-            (tag1, alltags, heading) = get_tags_and_heading(heading)
+            (tag1, alltags, heading) = find_tags_and_heading(heading)
         else:      # we are processing a non-heading line
             if line.startswith('#+SEQ_TODO'):
                 todos |= set(_RE_TODO_KWDS.findall(line))
@@ -189,12 +189,12 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
             if prop_srch:
                 propdict[prop_srch.group(1)] = prop_srch.group(2)
                 continue
-            _sched_date = get_scheduled(line)
-            _deadline_date = get_deadline(line)
+            _sched_date = find_scheduled(line)
+            _deadline_date = find_deadline(line)
             sched_date = _sched_date or sched_date
             deadline_date = _deadline_date or deadline_date
             if not _sched_date and not _deadline_date:
-                (dl, rl) = get_daterangelist(line)
+                (dl, rl) = find_daterangelist(line)
                 datelist += dl
                 rangelist += rl
             if not (line.startswith('#') or _sched_date or _deadline_date):
