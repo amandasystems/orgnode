@@ -48,7 +48,6 @@ def _re_compile_date():
     return re_date
 
 _RE_DATE = _re_compile_date()
-
 def get_daterangelist(string):
     datelist = []
     rangelist = []
@@ -62,6 +61,76 @@ def get_daterangelist(string):
             datelist.append(dt)
     return (datelist, rangelist)
 
+_RE_SCHEDULED = re.compile(
+    'SCHEDULED:\s+<(\d+)\-(\d+)\-(\d+)[^>\d]*((\d+)\:(\d+))?>')
+def get_scheduled(line):
+    """
+    Find SCHEDULED from given string.
+    Return datetime object if found else None.
+    """
+    sd_re = _RE_SCHEDULED.search(line)
+    if sd_re:
+        if sd_re.group(4) == None:
+            sched_date = datetime.date(int(sd_re.group(1)),
+                                       int(sd_re.group(2)),
+                                       int(sd_re.group(3)) )
+        else:
+            sched_date = datetime.datetime(int(sd_re.group(1)),
+                                           int(sd_re.group(2)),
+                                           int(sd_re.group(3)),
+                                           int(sd_re.group(5)),
+                                           int(sd_re.group(6)) )
+    else:
+        sched_date = None
+    return sched_date
+
+_RE_DEADLINE = re.compile(
+    'DEADLINE:\s+<(\d+)\-(\d+)\-(\d+)[^>\d]*((\d+)\:(\d+))?>')
+def get_deadline(line):
+    """
+    Find DEADLINE from given string.
+    Return datetime object if found else None.
+    """
+    dd_re = _RE_DEADLINE.search(line)
+    if dd_re:
+        if dd_re.group(4) == None:
+            deadline_date = datetime.date(int(dd_re.group(1)),
+                                          int(dd_re.group(2)),
+                                          int(dd_re.group(3)) )
+        else:
+            deadline_date = datetime.datetime(int(dd_re.group(1)),
+                                              int(dd_re.group(2)),
+                                              int(dd_re.group(3)),
+                                              int(dd_re.group(5)),
+                                              int(dd_re.group(6)) )
+    else:
+        deadline_date = None
+    return deadline_date
+
+_RE_TAGSRCH = re.compile('(.*?)\s*:(.*?):(.*?)$')
+def get_tags_and_heading(heading):
+    """
+    Get first tag, all tags, and heading without tags.
+    This is helper function of makelist.
+    """
+    tag1 = ""
+    alltags = set() # set of all tags in headline
+    tagsrch = _RE_TAGSRCH.search(heading)
+    if tagsrch:
+        heading = tagsrch.group(1)
+        tag1 = tagsrch.group(2)
+        alltags.add(tag1)
+        tag2 = tagsrch.group(3)
+        if tag2:
+            alltags |= set(tag2.split(':')) - set([''])
+    return (tag1, alltags, heading)
+
+
+_RE_HEADING = re.compile('^(\*+)\s(.*?)\s*$')
+_RE_TODO_KWDS = re.compile(' ([A-Z][A-Z0-9]+)\(?')
+_RE_PROP_SRCH = re.compile('^\s*:(.*?):\s*(.*?)\s*$')
+_RE_TODO_SRCH = re.compile('([A-Z][A-Z0-9]+)\s(.*?)$')
+_RE_PRTY_SRCH = re.compile('^\[\#(A|B|C)\] (.*?)$')
 
 def makelist(filename, todo_default=['TODO', 'DONE']):
     """
@@ -92,7 +161,7 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
 
     for line in f:
         ctr += 1
-        hdng = re.search('^(\*+)\s(.*?)\s*$', line)
+        hdng = _RE_HEADING.search(line)
         if hdng:
             if heading:  # we are processing a heading line
                 thisNode = Orgnode(level, heading, bodytext, tag1, alltags)
@@ -114,56 +183,23 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
             level = hdng.group(1)
             heading =  hdng.group(2)
             bodytext = ""
-            tag1 = ""
-            alltags = set() # set of all tags in headline
-            tagsrch = re.search('(.*?)\s*:(.*?):(.*?)$',heading)
-            if tagsrch:
-                heading = tagsrch.group(1)
-                tag1 = tagsrch.group(2)
-                alltags.add(tag1)
-                tag2 = tagsrch.group(3)
-                if tag2:
-                    alltags |= set(tag2.split(':')) - set([''])
+            (tag1, alltags, heading) = get_tags_and_heading(heading)
         else:      # we are processing a non-heading line
-            if line[:10] == '#+SEQ_TODO':
-                todos |= set(re.findall(' ([A-Z][A-Z0-9]+)\(?', line))
+            if line.startswith('#+SEQ_TODO'):
+                todos |= set(_RE_TODO_KWDS.findall(line))
 
-            if line[:1] != '#':
+            if line.startswith('#'):
                 bodytext = bodytext + line
 
-            if re.search(':PROPERTIES:', line): continue
-            if re.search(':END:', line): continue
-            prop_srch = re.search('^\s*:(.*?):\s*(.*?)\s*$', line)
+            if line.find(':PROPERTIES:') >= 0: continue
+            if line.find(':END:') >= 0: continue
+            prop_srch = _RE_PROP_SRCH.search(line)
             if prop_srch:
                 propdict[prop_srch.group(1)] = prop_srch.group(2)
                 continue
-            sd_re = re.search(
-               'SCHEDULED:\s+<(\d+)\-(\d+)\-(\d+)[^>\d]*((\d+)\:(\d+))?>', line)
-            if sd_re:
-                if sd_re.group(4) == None:
-                    sched_date = datetime.date(int(sd_re.group(1)),
-                                               int(sd_re.group(2)),
-                                               int(sd_re.group(3)) )
-                else:
-                    sched_date = datetime.datetime(int(sd_re.group(1)),
-                                                   int(sd_re.group(2)),
-                                                   int(sd_re.group(3)),
-                                                   int(sd_re.group(5)),
-                                                   int(sd_re.group(6)) )
-            dd_re = re.search(
-               'DEADLINE:\s+<(\d+)\-(\d+)\-(\d+)[^>\d]*((\d+)\:(\d+))?>', line)
-            if dd_re:
-                if dd_re.group(4) == None:
-                    deadline_date = datetime.date(int(dd_re.group(1)),
-                                                  int(dd_re.group(2)),
-                                                  int(dd_re.group(3)) )
-                else:
-                    deadline_date = datetime.datetime(int(dd_re.group(1)),
-                                                      int(dd_re.group(2)),
-                                                      int(dd_re.group(3)),
-                                                      int(dd_re.group(5)),
-                                                      int(dd_re.group(6)) )
-            if not sd_re and not dd_re:
+            sched_date = get_scheduled(line)
+            deadline_date = get_deadline(line)
+            if not sched_date and not deadline_date:
                 (dl, rl) = get_daterangelist(line)
                 datelist += dl
                 rangelist += rl
@@ -181,12 +217,12 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
     # process the headings searching for TODO keywords
     for n in nodelist:
         h = n.Heading()
-        todoSrch = re.search('([A-Z][A-Z0-9]+)\s(.*?)$', h)
+        todoSrch = _RE_TODO_SRCH.search(h)
         if todoSrch:
             if todoSrch.group(1) in todos:
                 n.setHeading( todoSrch.group(2) )
                 n.setTodo ( todoSrch.group(1) )
-        prtysrch = re.search('^\[\#(A|B|C)\] (.*?)$', n.Heading())
+        prtysrch = _RE_PRTY_SRCH.search(n.Heading())
         if prtysrch:
             n.setPriority(prtysrch.group(1))
             n.setHeading(prtysrch.group(2))
