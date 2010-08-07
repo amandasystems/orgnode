@@ -1,0 +1,6 @@
+#+STARTUP: hidestars
+* Heading
+  SCHEDULED: <2010-08-06 Fri> DEADLINE: <2010-08-10 Tue>
+  :PROPERTIES:
+  :Effort_ALL: 0:10
+  :END:

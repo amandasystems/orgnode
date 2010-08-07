@@ -1,0 +1,14 @@
+#+STARTUP: hidestars
+#+SEQ_TODO: TODO1 TODO2 TODO3 TODO4
+
+* TODO1 Heading (Level 1) 1					       :TAG1:
+** TODO2 Heading (Level 2) 1					       :TAG2:
+*** TODO3 Heading (Level 3) 1					       :TAG3:
+**** TODO4 Heading (Level 4) 1					       :TAG4:
+     CLOSED: [2010-08-06 Fri 21:45]
+** Heading (Level 2) 2
+** Heading (Level 2) 3
+* Heading (Level 1) 2
+** Heading (Level 2) 4
+** Heading (Level 2) 5
+* Heading (Level 1) 3

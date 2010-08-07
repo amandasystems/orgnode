@@ -162,7 +162,7 @@ def makelist(filename):
                         if t != '': alltags.append(t)
         else:      # we are processing a non-heading line
             if line[:10] == '#+SEQ_TODO':
-                kwlist = re.findall(' ([A-Z]+)\(?', line)
+                kwlist = re.findall(' ([A-Z][A-Z0-9]+)\(?', line)
                 for kw in kwlist: todos[kw] = ""
 
             if line[:1] != '#':
@@ -218,7 +218,7 @@ def makelist(filename):
     # process the headings searching for TODO keywords
     for n in nodelist:
         h = n.Heading()
-        todoSrch = re.search('([A-Z]+)\s(.*?)$', h)
+        todoSrch = re.search('([A-Z][A-Z0-9]+)\s(.*?)$', h)
         if todoSrch:
             if todos.has_key( todoSrch.group(1) ):
                 n.setHeading( todoSrch.group(2) )
@@ -354,6 +354,12 @@ class Orgnode(object):
         name/value pairs
         """
         self.properties = dictval
+
+    def Properties(self):
+        """
+        Return the value of the properties.
+        """
+        return self.properties
 
     def Property(self, keyval):
         """
