@@ -63,7 +63,7 @@ def get_daterangelist(string):
     return (datelist, rangelist)
 
 
-def makelist(filename):
+def makelist(filename, todo_default=['TODO', 'DONE']):
     """
     Read an org-mode file and return a list of Orgnode objects
     created from this file.
@@ -77,9 +77,7 @@ def makelist(filename):
         print "Program terminating."
         sys.exit(1)
 
-    todos         = dict()  # populated from #+SEQ_TODO line
-    todos['TODO'] = ''   # default values
-    todos['DONE'] = ''   # default values
+    todos = set(todo_default) # populated from #+SEQ_TODO line
     level         = 0
     heading       = ""
     bodytext      = ""
@@ -129,8 +127,7 @@ def makelist(filename):
                         if t != '': alltags.append(t)
         else:      # we are processing a non-heading line
             if line[:10] == '#+SEQ_TODO':
-                kwlist = re.findall(' ([A-Z][A-Z0-9]+)\(?', line)
-                for kw in kwlist: todos[kw] = ""
+                todos |= set(re.findall(' ([A-Z][A-Z0-9]+)\(?', line))
 
             if line[:1] != '#':
                 bodytext = bodytext + line
@@ -187,7 +184,7 @@ def makelist(filename):
         h = n.Heading()
         todoSrch = re.search('([A-Z][A-Z0-9]+)\s(.*?)$', h)
         if todoSrch:
-            if todos.has_key( todoSrch.group(1) ):
+            if todoSrch.group(1) in todos:
                 n.setHeading( todoSrch.group(2) )
                 n.setTodo ( todoSrch.group(1) )
         prtysrch = re.search('^\[\#(A|B|C)\] (.*?)$', n.Heading())
@@ -231,7 +228,7 @@ class Orgnode(object):
         self.headline = headline
         self.body = body
         self.tag = tag            # The first tag in the list
-        self.tags = dict()        # All tags in the headline
+        self.tags = set(alltags)  # All tags in the headline
         self.todo = ""
         self.prty = ""            # empty of A, B or C
         self.scheduled = ""       # Scheduled date
@@ -240,8 +237,6 @@ class Orgnode(object):
         self.datelist = []
         self.rangelist = []
         self.parent = None
-        for t in alltags:
-            self.tags[t] = ''
 
         # Look for priority in headline and transfer to prty field
 
@@ -299,9 +294,9 @@ class Orgnode(object):
         If `inher` is True, then all tags from ancestors is included.
         """
         if inher and self.parent:
-            return set(self.tags.keys()) | set(self.parent.Tags(True))
+            return self.tags | set(self.parent.Tags(True))
         else:
-            return set(self.tags.keys())
+            return self.tags
 
     def hasTag(self, srch):
         """
@@ -309,7 +304,7 @@ class Orgnode(object):
         For example, hasTag('COMPUTER') on headling containing
         :HOME:COMPUTER: would return True.
         """
-        return self.tags.has_key(srch)
+        return srch in self.tags
 
     def setTag(self, newtag):
         """
@@ -322,8 +317,7 @@ class Orgnode(object):
         Store all the tags found in the headline. The first tag will
         also be stored as if the setTag method was called.
         """
-        for t in taglist:
-            self.tags[t] = ''
+        self.tags |= set(taglist)
 
     def Todo(self):
         """
@@ -438,7 +432,7 @@ class Orgnode(object):
         n = n + self.headline
         n = "%-60s " % n     # hack - tags will start in column 62
         closecolon = ''
-        for t in self.tags.keys():
+        for t in sorted(self.tags):
             n = n + ':' + t
             closecolon = ':'
         n = n + closecolon
