@@ -125,10 +125,27 @@ def find_tags_and_heading(heading):
             alltags |= set(tag2.split(':')) - set([''])
     return (tag1, alltags, heading)
 
+_RE_PROP_SRCH = re.compile('^\s*:(.*?):\s*(.*?)\s*$')
+def find_property(line):
+    """
+    Find property from given string.
+    Return (key, value)-pair if found else (None, None).
+    """
+    prop_key = None
+    prop_val = None
+    prop_srch = _RE_PROP_SRCH.search(line)
+    if prop_srch:
+        prop_key = prop_srch.group(1)
+        prop_val = prop_srch.group(2)
+        if prop_key == 'Effort_ALL':
+            (h, m) = prop_val.split(":", 2)
+            if h.isdigit() and m.isdigit():
+                prop_val = int(h)*60 + int(m)
+    return (prop_key, prop_val)
+
 
 _RE_HEADING = re.compile('^(\*+)\s(.*?)\s*$')
 _RE_TODO_KWDS = re.compile(' ([A-Z][A-Z0-9]+)\(?')
-_RE_PROP_SRCH = re.compile('^\s*:(.*?):\s*(.*?)\s*$')
 _RE_TODO_SRCH = re.compile('([A-Z][A-Z0-9]+)\s(.*?)$')
 _RE_PRTY_SRCH = re.compile('^\[\#(A|B|C)\] (.*?)$')
 
@@ -185,9 +202,9 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
                 continue
             if line.find(':PROPERTIES:') >= 0: continue
             if line.find(':END:') >= 0: continue
-            prop_srch = _RE_PROP_SRCH.search(line)
-            if prop_srch:
-                propdict[prop_srch.group(1)] = prop_srch.group(2)
+            (prop_key, prop_val) = find_property(line)
+            if prop_key:
+                propdict[prop_key] = prop_val
                 continue
             _sched_date = find_scheduled(line)
             _deadline_date = find_deadline(line)
