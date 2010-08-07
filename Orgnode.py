@@ -182,10 +182,7 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
         else:      # we are processing a non-heading line
             if line.startswith('#+SEQ_TODO'):
                 todos |= set(_RE_TODO_KWDS.findall(line))
-
-            if line.startswith('#'):
-                bodytext = bodytext + line
-
+                continue
             if line.find(':PROPERTIES:') >= 0: continue
             if line.find(':END:') >= 0: continue
             prop_srch = _RE_PROP_SRCH.search(line)
@@ -200,6 +197,8 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
                 (dl, rl) = get_daterangelist(line)
                 datelist += dl
                 rangelist += rl
+            if not (line.startswith('#') or _sched_date or _deadline_date):
+                bodytext = bodytext + line
 
     # write out last node
     thisNode = Orgnode(level, heading, bodytext, tag1, alltags)

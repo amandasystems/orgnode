@@ -26,7 +26,7 @@ def check_data(dataname):
             val = value_from_data_key(node, key)
             eq_(kwds[key], val,
                 msg=('check value of %d-th node of key "%s" from "%s". '
-                     'Orgnode.%s() = %s != %s.'
+                     'Orgnode.%s() = "%s" != "%s".'
                      ) % (i, key, oname, key.title(), val, kwds[key]))
 
 def test_data():
