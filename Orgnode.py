@@ -4,7 +4,7 @@ headline and associated text from an org-mode file, and routines for
 constructing data structures of these classes.
 """
 
-import re, sys
+import re
 import datetime
 import codecs
 
@@ -139,12 +139,7 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
     """
     ctr = 0
 
-    try:
-        f = codecs.open(filename, 'r')
-    except IOError:
-        print "Unable to open file [%s] " % filename
-        print "Program terminating."
-        sys.exit(1)
+    f = codecs.open(filename, 'r')
 
     todos = set(todo_default) # populated from #+SEQ_TODO line
     level         = 0
