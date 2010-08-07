@@ -1,6 +1,6 @@
-def nodedict(i, level, todo='', tags=set([]), tags_inher=set([])):
+def nodedict(i, Level, Todo='', Tags=set([]), Tags_inher=set([])):
     return dict(
-        heading="Heading %d"%i, level=level, tags=tags, tags_inher=tags_inher)
+        Heading="Heading %d"%i, Level=Level, Tags=Tags, Tags_inher=Tags_inher)
 
 def tags(nums):
     return set(['TAG%d'%i for i in nums])

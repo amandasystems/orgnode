@@ -4,3 +4,6 @@
   :PROPERTIES:
   :Effort_ALL: 0:10
   :END:
+  - <2010-08-16 Mon> DateList
+  - <2010-08-07 Sat>--<2010-08-08 Sun>
+  - <2010-08-09 Mon 00:30>--<2010-08-10 Tue 13:20> RangeList

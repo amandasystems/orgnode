@@ -10,11 +10,10 @@ def value_from_data_key(node, key):
     """
     Helper function for check_data. Get value from Orgnode by key.
     """
-    if key == 'tags_inher':
+    if key == 'Tags_inher':
         return node.Tags(inher=True)
     else:
-        return node.__getattribute__(key.title())()
-
+        return node.__getattribute__(key)()
 
 def check_data(dataname):
     """Helper function for test_data"""

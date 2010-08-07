@@ -197,9 +197,11 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
             if prop_srch:
                 propdict[prop_srch.group(1)] = prop_srch.group(2)
                 continue
-            sched_date = get_scheduled(line)
-            deadline_date = get_deadline(line)
-            if not sched_date and not deadline_date:
+            _sched_date = get_scheduled(line)
+            _deadline_date = get_deadline(line)
+            sched_date = _sched_date or sched_date
+            deadline_date = _deadline_date or deadline_date
+            if not _sched_date and not _deadline_date:
                 (dl, rl) = get_daterangelist(line)
                 datelist += dl
                 rangelist += rl
@@ -211,6 +213,12 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
         thisNode.setScheduled(sched_date)
     if deadline_date:
         thisNode.setDeadline(deadline_date)
+    if datelist:
+        thisNode.setDateList(datelist)
+        datelist = []
+    if rangelist:
+        thisNode.setRangeList(rangelist)
+        rangelist = []
     nodelist.append( thisNode )
 
     # using the list of TODO keywords found in the file
