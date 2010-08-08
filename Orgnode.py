@@ -156,7 +156,7 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
     """
     ctr = 0
 
-    f = codecs.open(filename, 'r')
+    f = codecs.open(filename, 'r', 'utf8')
 
     todos = set(todo_default) # populated from #+SEQ_TODO line
     level         = 0
