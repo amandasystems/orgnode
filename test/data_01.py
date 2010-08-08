@@ -3,6 +3,11 @@ data = [
     dict(Heading = "Heading",
          Scheduled = date(2010, 8, 6),
          Deadline = date(2010, 8, 10),
+         Closed = datetime(2010, 8, 8, 18, 0),
+         Clock = [
+             (datetime(2010, 8, 8, 17, 40), datetime(2010, 8, 8, 17, 50), 10),
+             (datetime(2010, 8, 8, 17, 00), datetime(2010, 8, 8, 17, 30), 30),
+             ],
          Properties = dict(Effort=70),
          DateList = [date(2010, 8, 16)],
          RangeList = [

@@ -1,6 +1,8 @@
 #+STARTUP: hidestars
-* Heading
-  SCHEDULED: <2010-08-06 Fri> DEADLINE: <2010-08-10 Tue>
+* DONE Heading
+  SCHEDULED: <2010-08-06 Fri> DEADLINE: <2010-08-10 Tue> CLOSED: [2010-08-08 Sun 18:00]
+  CLOCK: [2010-08-08 Sun 17:40]--[2010-08-08 Sun 17:50] =>  0:10
+  CLOCK: [2010-08-08 Sun 17:00]--[2010-08-08 Sun 17:30] =>  0:30
   :PROPERTIES:
   :Effort: 1:10
   :END:

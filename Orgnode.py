@@ -144,6 +144,54 @@ def find_property(line):
     return (prop_key, prop_val)
 
 
+_RE_CLOSED = re.compile(
+    'CLOSED:\s+\[(\d+)\-(\d+)\-(\d+)[^>\d]*((\d+)\:(\d+))?\]')
+def find_closed(line):
+    """
+    Find CLOSED from given string.
+    Return datetime object if found else None.
+    """
+    cl_re = _RE_CLOSED.search(line)
+    if cl_re:
+        if cl_re.group(4) == None:
+            closed_date = datetime.date(int(cl_re.group(1)),
+                                        int(cl_re.group(2)),
+                                        int(cl_re.group(3)) )
+        else:
+            closed_date = datetime.datetime(int(cl_re.group(1)),
+                                            int(cl_re.group(2)),
+                                            int(cl_re.group(3)),
+                                            int(cl_re.group(5)),
+                                            int(cl_re.group(6)) )
+    else:
+        closed_date = None
+    return closed_date
+
+
+_RE_CLOCK = re.compile(
+    'CLOCK:\s+'
+    '\[(\d+)\-(\d+)\-(\d+)[^>\d]*(\d+)\:(\d+)\]--'
+    '\[(\d+)\-(\d+)\-(\d+)[^>\d]*(\d+)\:(\d+)\]\s+=>\s+(\d+)\:(\d+)'
+    )
+def find_clock(line):
+    """
+    Find CLOCK from given string.
+    Return three tuple (start, stop, length) which is datetime object
+    of start time, datetime object of stop time and length in minute.
+    """
+    match = _RE_CLOCK.search(line)
+    if match is None:
+        return None
+    groups = [int(d) for d in match.groups()]
+    ymdhm1 = groups[:5]
+    ymdhm2 = groups[5:10]
+    hm3 = groups[10:]
+    return (
+        datetime.datetime(*ymdhm1),
+        datetime.datetime(*ymdhm2),
+        hm3[0]*60 + hm3[1],
+        )
+
 _RE_HEADING = re.compile('^(\*+)\s(.*?)\s*$')
 _RE_TODO_KWDS = re.compile(' ([A-Z][A-Z0-9]+)\(?')
 _RE_TODO_SRCH = re.compile('([A-Z][A-Z0-9]+)\s(.*?)$')
@@ -166,6 +214,8 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
     alltags       = set([]) # set of all tags in headline
     sched_date    = ''
     deadline_date = ''
+    closed_date   = ''
+    clocklist     = []
     datelist      = []
     rangelist     = []
     nodelist      = []
@@ -183,6 +233,12 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
                 if deadline_date:
                     thisNode.setDeadline(deadline_date)
                     deadline_date = ''
+                if closed_date:
+                    thisNode.setClosed(closed_date)
+                    closed_date = ''
+                if clocklist:
+                    thisNode.setClock(clocklist)
+                    clocklist = []
                 if datelist:
                     thisNode.setDateList(datelist)
                     datelist = []
@@ -208,13 +264,19 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
                 continue
             _sched_date = find_scheduled(line)
             _deadline_date = find_deadline(line)
+            _closed_date = find_closed(line)
             sched_date = _sched_date or sched_date
             deadline_date = _deadline_date or deadline_date
+            closed_date = closed_date or _closed_date
             if not _sched_date and not _deadline_date:
                 (dl, rl) = find_daterangelist(line)
                 datelist += dl
                 rangelist += rl
-            if not (line.startswith('#') or _sched_date or _deadline_date):
+            clock = find_clock(line)
+            if clock:
+                clocklist.append(clock)
+            if not (line.startswith('#') or _sched_date or _deadline_date
+                    or clock or _closed_date):
                 bodytext = bodytext + line
 
     # write out last node
@@ -224,6 +286,12 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
         thisNode.setScheduled(sched_date)
     if deadline_date:
         thisNode.setDeadline(deadline_date)
+    if closed_date:
+        thisNode.setClosed(closed_date)
+        closed_date = ''
+    if clocklist:
+        thisNode.setClock(clocklist)
+        clocklist = []
     if datelist:
         thisNode.setDateList(datelist)
         datelist = []
@@ -287,6 +355,8 @@ class Orgnode(object):
         self.prty = ""            # empty of A, B or C
         self.scheduled = ""       # Scheduled date
         self.deadline = ""        # Deadline date
+        self.clocked = []
+        self.closed = ""
         self.properties = dict()
         self.datelist = []
         self.rangelist = []
@@ -458,6 +528,32 @@ class Orgnode(object):
                 bool(self.deadline) or
                 bool(self.datelist) or
                 bool(self.rangelist) )
+
+    def setClosed(self, closed):
+        """
+        Set the closed date using the supplied date object
+        """
+        self.closed = closed
+
+    def Closed(self):
+        """
+        Return closed time as datetime object or empty string if nonexistent.
+        """
+        return self.closed
+
+    def setClock(self, clock):
+        """
+        Set the list of clocked time using list of three tuple
+        (start, stop, length) which is datetime object of start time,
+        datetime object of stop time and length in minute.
+        """
+        self.clock = clock[:]
+
+    def Clock(self):
+        """
+        Return list of clocked time (tuple of (start, stop, length))
+        """
+        return self.clock
 
     def setParent(self, parent):
         """
