@@ -137,7 +137,7 @@ def find_property(line):
     if prop_srch:
         prop_key = prop_srch.group(1)
         prop_val = prop_srch.group(2)
-        if prop_key == 'Effort_ALL':
+        if prop_key == 'Effort':
             (h, m) = prop_val.split(":", 2)
             if h.isdigit() and m.isdigit():
                 prop_val = int(h)*60 + int(m)
