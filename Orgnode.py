@@ -355,7 +355,7 @@ class Orgnode(object):
         self.prty = ""            # empty of A, B or C
         self.scheduled = ""       # Scheduled date
         self.deadline = ""        # Deadline date
-        self.clocked = []
+        self.clock = []
         self.closed = ""
         self.properties = dict()
         self.datelist = []
