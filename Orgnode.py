@@ -145,7 +145,7 @@ def find_property(line):
 
 
 _RE_CLOSED = re.compile(
-    'CLOSED:\s+\[(\d+)\-(\d+)\-(\d+)[^>\d]*((\d+)\:(\d+))?\]')
+    'CLOSED:\s+\[(\d+)\-(\d+)\-(\d+)[^\]\d]*((\d+)\:(\d+))?\]')
 def find_closed(line):
     """
     Find CLOSED from given string.
@@ -170,8 +170,8 @@ def find_closed(line):
 
 _RE_CLOCK = re.compile(
     'CLOCK:\s+'
-    '\[(\d+)\-(\d+)\-(\d+)[^>\d]*(\d+)\:(\d+)\]--'
-    '\[(\d+)\-(\d+)\-(\d+)[^>\d]*(\d+)\:(\d+)\]\s+=>\s+(\d+)\:(\d+)'
+    '\[(\d+)\-(\d+)\-(\d+)[^\]\d]*(\d+)\:(\d+)\]--'
+    '\[(\d+)\-(\d+)\-(\d+)[^\]\d]*(\d+)\:(\d+)\]\s+=>\s+(\d+)\:(\d+)'
     )
 def find_clock(line):
     """
