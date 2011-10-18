@@ -567,6 +567,25 @@ class Orgnode(object):
         """
         return self.parent
 
+    def Root(self):
+        """
+        Return root node
+
+        What is root node?::
+
+          * I am node A, a root node       <- Root node!
+          ** I am a child of node A
+          ** I am a child of node A too
+          * I am also a root node            <- Root node!
+
+        """
+        child = self
+        while True:
+            parent = child.Parent()
+            if parent is None:
+                return child
+            child = parent
+
     def __repr__(self):
         """
         Print the level, heading text and tag of a node and the body
