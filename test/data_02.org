@@ -1,0 +1,4 @@
+#+STARTUP: hidestars
+* A node with no TODO and [[http://google.com][a link]]
+* A node with a raw link: http://google.com
+* A node with [some brackets]
