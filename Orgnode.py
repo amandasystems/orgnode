@@ -194,7 +194,7 @@ def find_clock(line):
 
 _RE_HEADING = re.compile('^(\*+)\s(.*?)\s*$')
 _RE_TODO_KWDS = re.compile(' ([A-Z][A-Z0-9]+)\(?')
-_RE_TODO_SRCH = re.compile('([A-Z][A-Z0-9]+)\s(.*?)$')
+_RE_TODO_SRCH = re.compile('^\s*([A-Z][A-Z0-9]+)\s(.*?)$')
 _RE_PRTY_SRCH = re.compile('^\[\#(A|B|C)\] (.*?)$')
 
 def makelist(filename, todo_default=['TODO', 'DONE']):
@@ -224,6 +224,7 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
     for line in f:
         ctr += 1
         hdng = _RE_HEADING.search(line)
+
         if hdng:
             if heading:  # we are processing a heading line
                 thisNode = Orgnode(level, heading, bodytext, tag1, alltags)
@@ -304,7 +305,9 @@ def makelist(filename, todo_default=['TODO', 'DONE']):
     # process the headings searching for TODO keywords
     for n in nodelist:
         h = n.Heading()
+
         todoSrch = _RE_TODO_SRCH.search(h)
+
         if todoSrch:
             if todoSrch.group(1) in todos:
                 n.setHeading( todoSrch.group(2) )
