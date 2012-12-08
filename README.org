@@ -1,0 +1,32 @@
+* Orgnode
+[[http://members.optusnet.com.au/~charles57/GTD/orgnode.html][»Orgnode - reading org-mode in Python«]] was originally developed by
+[[http://members.optusnet.com.au/~charles57/GTD/][Charles Cave]]. This is a fork by Takafumi Arakaki, with some minor
+fixes by Albin Stjerna.
+* How to use
+Just set the =Orgnode.py= where your python can import this module.
+
+Some samples (directly from Cave's version):
+#+begin_src python
+import Orgnode, datetime
+
+today = datetime.date.today()
+print "Daily plan for", today
+print "-------------------------\n"
+
+filename = "c:/charles/GTD/newgtd.org"
+nodelist = Orgnode.makelist(filename)
+
+for n in nodelist:
+    if n.Scheduled() == today:
+         print "[ ] %s (%s)" % (n.Heading(), n.Tag() )
+#+end_src
+
+* Differences to Araraki's and Cave's versions
+So far, the only thing I've really done is adding a few test cases and
+fixing a bug in one of the regular expressions that would produce
+incorrect results when a TODO keyword appeared inside a paragraph. I
+do, however, intend to use orgnode, and improve on it when I find
+bugs.
+
+As far as I can tell, Araraki's verison is a significant improvement
+over Cave's, fixing proper unicode handling among other things.
