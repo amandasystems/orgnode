@@ -21,12 +21,16 @@ for n in nodelist:
          print "[ ] %s (%s)" % (n.Heading(), n.Tag() )
 #+end_src
 
-* Differences to Araraki's and Cave's versions
+* Tests
+Orgnode uses [[https://nose.readthedocs.org/en/latest/][nose]] for unit tests, thanks to Arakaki. To run them, just
+execute =nosetests= in the Orgnode directory. You do need to symlink
+in orgnode.py into the tests directory for it to work, though.
+* Differences to Arakaki's and Cave's versions
 So far, the only thing I've really done is adding a few test cases and
 fixing a bug in one of the regular expressions that would produce
 incorrect results when a TODO keyword appeared inside a paragraph. I
 do, however, intend to use orgnode, and improve on it when I find
 bugs.
 
-As far as I can tell, Araraki's verison is a significant improvement
+As far as I can tell, Arakaki's verison is a significant improvement
 over Cave's, fixing proper unicode handling among other things.
