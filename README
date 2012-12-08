@@ -25,7 +25,7 @@ Just set the Orgnode.py where your python can import this module.
 Differences to Araraki's and Cave's versions
 ============================================
 
-So far, the only thing I've really done is added a few test cases and
+So far, the only thing I've really done is adding a few test cases and
 fixing a bug in one of the regular expressions that would produce
 incorrect results when a TODO keyword appeared inside a paragraph. I
 do, however, intend to use orgnode, and improve on it when I find
