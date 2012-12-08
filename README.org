@@ -1,6 +1,6 @@
 * Orgnode
 [[http://members.optusnet.com.au/~charles57/GTD/orgnode.html][»Orgnode - reading org-mode in Python«]] was originally developed by
-[[http://members.optusnet.com.au/~charles57/GTD/][Charles Cave]]. This is a fork by Takafumi Arakaki, with some minor
+[[http://members.optusnet.com.au/~charles57/GTD/][Charles Cave]]. This is [[https://bitbucket.org/tkf/orgnode][a fork by Takafumi Arakaki]], with some minor
 fixes by Albin Stjerna.
 * How to use
 Just set the =Orgnode.py= where your python can import this module.
